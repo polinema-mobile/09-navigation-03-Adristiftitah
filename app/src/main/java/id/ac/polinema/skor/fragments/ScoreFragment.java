@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.navigation.Navigation;
 
 import java.util.ArrayList;
@@ -44,9 +46,25 @@ public class ScoreFragment extends Fragment {
 							 Bundle savedInstanceState) {
 		FragmentScoreBinding binding = DataBindingUtil
 				.inflate(inflater, R.layout.fragment_score, container, false);
+		binding.setFragment(this);
 		binding.setHomeGoalScorerList(homeGoalScorerList);
 		binding.setAwayGoalScorerList(awayGoalScorerList);
-		binding.setFragment(this);
+
+		getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+				GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
+				homeGoalScorerList.add(goalScorer);
+			}
+		});
+
+		getParentFragmentManager().setFragmentResultListener(AWAY_REQUEST_KEY, this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+				GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
+				awayGoalScorerList.add(goalScorer);
+			}
+		});
 		return binding.getRoot();
 	}
 
